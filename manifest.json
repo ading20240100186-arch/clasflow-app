@@ -1,0 +1,17 @@
+{
+  "name": "Catatan Pengeluaran",
+  "short_name": "Catatan",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f3f7ff",
+  "theme_color": "#4f46e5",
+  "description": "Aplikasi catatan pengeluaran untuk harian, bulanan, dan tahunan",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%234f46e5'/%3E%3Cpath d='M150 170h212v32H150zm0 72h212v32H150zm0 72h140v32H150z' fill='white'/%3E%3Ccircle cx='330' cy='288' r='40' fill='white'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
