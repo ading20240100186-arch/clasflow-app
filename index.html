@@ -257,6 +257,54 @@
                 return `Laporan Belanja Tahunan\nTahun: ${tahunPilih.value}\nTotal: ${hasilTahunan.textContent}\nMata uang: ${mataUang}`;
             }
 
+            function escapePdfText(text) {
+                return String(text)
+                    .replace(/\\/g, '\\\\')
+                    .replace(/\(/g, '\\(')
+                    .replace(/\)/g, '\\)')
+                    .replace(/\r?\n/g, ' ');
+            }
+
+            function buildPdfBlob(title, lines) {
+                const pageWidth = 595;
+                const pageHeight = 842;
+                const lineHeight = 18;
+                let y = 790;
+
+                const content = lines.map((line) => {
+                    const safeLine = escapePdfText(line);
+                    const text = `BT /F1 12 Tf 50 ${y} Td (${safeLine}) Tj ET`;
+                    y -= lineHeight;
+                    return text;
+                }).join(' ');
+
+                const objects = [
+                    '<< /Type /Catalog /Pages 2 0 R >>',
+                    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+                    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+                    `<< /Length ${content.length + 2} >>\nstream\n${content}\nendstream`,
+                    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
+                ];
+
+                let pdf = '%PDF-1.4\n';
+                const offsets = [0];
+
+                objects.forEach((obj, index) => {
+                    offsets.push(pdf.length);
+                    pdf += `${index + 1} 0 obj\n${obj}\nendobj\n`;
+                });
+
+                const xrefOffset = pdf.length;
+                pdf += `xref\n0 ${objects.length + 1}\n`;
+                pdf += '0000000000 65535 f \n';
+                for (let i = 1; i <= objects.length; i++) {
+                    pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+                }
+                pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+                return new Blob([pdf], { type: 'application/pdf' });
+            }
+
             function bagikanSection(sectionId, platform = 'whatsapp') {
                 const judul = {
                     'tabel-harian': 'Laporan Belanja Harian',
@@ -264,41 +312,49 @@
                     'tabel-tahunan': 'Laporan Belanja Tahunan'
                 }[sectionId] || 'Laporan Keuangan';
 
-                const shareText = `${judul}\n\n${getShareText(sectionId)}`;
-                const shareUrl = window.location.href;
+                const reportLines = [judul, '', getShareText(sectionId)];
+                const file = new File([buildPdfBlob(judul, reportLines)], `${judul.replace(/\s+/g, '_')}.pdf`, {
+                    type: 'application/pdf'
+                });
 
-                if (platform === 'copy') {
-                    if (navigator.clipboard) {
-                        navigator.clipboard.writeText(shareText).then(() => {
-                            alert('Teks laporan berhasil disalin ke clipboard.');
-                        }).catch(() => {
-                            alert(shareText);
-                        });
-                    } else {
-                        alert(shareText);
-                    }
-                    return;
-                }
-
-                if (platform === 'telegram') {
-                    const telegramLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-                    window.open(telegramLink, '_blank', 'noopener');
-                    return;
-                }
-
-                if (navigator.share) {
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         title: judul,
-                        text: shareText,
-                        url: shareUrl
+                        text: getShareText(sectionId),
+                        files: [file]
                     }).catch(() => {
-                        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                        if (platform === 'telegram') {
+                            const telegramLink = `https://t.me/share?text=${encodeURIComponent(getShareText(sectionId))}`;
+                            window.open(telegramLink, '_blank', 'noopener');
+                            return;
+                        }
+
+                        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(getShareText(sectionId))}`;
                         window.open(whatsappLink, '_blank', 'noopener');
                     });
                     return;
                 }
 
-                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                if (platform === 'copy') {
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(getShareText(sectionId)).then(() => {
+                            alert('Teks laporan berhasil disalin ke clipboard.');
+                        }).catch(() => {
+                            alert(getShareText(sectionId));
+                        });
+                    } else {
+                        alert(getShareText(sectionId));
+                    }
+                    return;
+                }
+
+                if (platform === 'telegram') {
+                    const telegramLink = `https://t.me/share?text=${encodeURIComponent(getShareText(sectionId))}`;
+                    window.open(telegramLink, '_blank', 'noopener');
+                    return;
+                }
+
+                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(getShareText(sectionId))}`;
                 window.open(whatsappLink, '_blank', 'noopener');
             }
 
