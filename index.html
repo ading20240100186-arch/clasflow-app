@@ -106,6 +106,7 @@
 
                     <button type="button" id="simpan-harian" class="btn-simpan-harian">Simpan ke Bulanan</button>
                     <div class="share-actions">
+                        <button type="button" class="btn-share pdf" data-section="tabel-harian" data-platform="pdf">Download PDF</button>
                         <button type="button" class="btn-share whatsapp" data-section="tabel-harian" data-platform="whatsapp">WhatsApp</button>
                         <button type="button" class="btn-share telegram" data-section="tabel-harian" data-platform="telegram">Telegram</button>
                         <button type="button" class="btn-share copy" data-section="tabel-harian" data-platform="copy">Salin Teks</button>
@@ -142,6 +143,7 @@
 
                     <button type="button" id="simpan-bulanan" class="btn-simpan">Simpan</button>
                     <div class="share-actions">
+                        <button type="button" class="btn-share pdf" data-section="tabel-bulanan" data-platform="pdf">Download PDF</button>
                         <button type="button" class="btn-share whatsapp" data-section="tabel-bulanan" data-platform="whatsapp">WhatsApp</button>
                         <button type="button" class="btn-share telegram" data-section="tabel-bulanan" data-platform="telegram">Telegram</button>
                         <button type="button" class="btn-share copy" data-section="tabel-bulanan" data-platform="copy">Salin Teks</button>
@@ -165,6 +167,7 @@
 
                     <button type="button" id="simpan-tahunan" class="btn-simpan">Sinkronkan Tahun</button>
                     <div class="share-actions">
+                        <button type="button" class="btn-share pdf" data-section="tabel-tahunan" data-platform="pdf">Download PDF</button>
                         <button type="button" class="btn-share whatsapp" data-section="tabel-tahunan" data-platform="whatsapp">WhatsApp</button>
                         <button type="button" class="btn-share telegram" data-section="tabel-tahunan" data-platform="telegram">Telegram</button>
                         <button type="button" class="btn-share copy" data-section="tabel-tahunan" data-platform="copy">Salin Teks</button>
@@ -257,50 +260,17 @@
                 return `Laporan Belanja Tahunan\nTahun: ${tahunPilih.value}\nTotal: ${hasilTahunan.textContent}\nMata uang: ${mataUang}`;
             }
 
-            function escapePdfText(text) {
-                return String(text)
-                    .replace(/\\/g, '\\\\')
-                    .replace(/\(/g, '\\(')
-                    .replace(/\)/g, '\\)')
-                    .replace(/\r?\n/g, ' ');
-            }
+            function generatePdfBlob(sectionId) {
+                const judul = {
+                    'tabel-harian': 'Laporan Belanja Harian',
+                    'tabel-bulanan': 'Laporan Belanja Bulanan',
+                    'tabel-tahunan': 'Laporan Belanja Tahunan'
+                }[sectionId] || 'Laporan Keuangan';
 
-            function buildPdfBlob(title, lines) {
-                const pageWidth = 595;
-                const pageHeight = 842;
-                const lineHeight = 18;
-                let y = 790;
-
-                const content = lines.map((line) => {
-                    const safeLine = escapePdfText(line);
-                    const text = `BT /F1 12 Tf 50 ${y} Td (${safeLine}) Tj ET`;
-                    y -= lineHeight;
-                    return text;
-                }).join(' ');
-
-                const objects = [
-                    '<< /Type /Catalog /Pages 2 0 R >>',
-                    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-                    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
-                    `<< /Length ${content.length + 2} >>\nstream\n${content}\nendstream`,
-                    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
-                ];
-
-                let pdf = '%PDF-1.4\n';
-                const offsets = [0];
-
-                objects.forEach((obj, index) => {
-                    offsets.push(pdf.length);
-                    pdf += `${index + 1} 0 obj\n${obj}\nendobj\n`;
-                });
-
-                const xrefOffset = pdf.length;
-                pdf += `xref\n0 ${objects.length + 1}\n`;
-                pdf += '0000000000 65535 f \n';
-                for (let i = 1; i <= objects.length; i++) {
-                    pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
-                }
-                pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+                const lines = [judul, '', getShareText(sectionId)];
+                const content = lines.join('\n');
+                const pdfText = `BT /F1 12 Tf 50 780 Td (${content.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}) Tj ET`;
+                const pdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n4 0 obj\n<< /Length ${pdfText.length} >>\nstream\n${pdfText}\nendstream\nendobj\n5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000010 00000 n \n0000000062 00000 n \n0000000122 00000 n \n0000000395 00000 n \n0000001334 00000 n \ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n1399\n%%EOF`;
 
                 return new Blob([pdf], { type: 'application/pdf' });
             }
@@ -312,49 +282,54 @@
                     'tabel-tahunan': 'Laporan Belanja Tahunan'
                 }[sectionId] || 'Laporan Keuangan';
 
-                const reportLines = [judul, '', getShareText(sectionId)];
-                const file = new File([buildPdfBlob(judul, reportLines)], `${judul.replace(/\s+/g, '_')}.pdf`, {
-                    type: 'application/pdf'
-                });
+                const shareText = `${judul}\n\n${getShareText(sectionId)}`;
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        title: judul,
-                        text: getShareText(sectionId),
-                        files: [file]
-                    }).catch(() => {
-                        if (platform === 'telegram') {
-                            const telegramLink = `https://t.me/share?text=${encodeURIComponent(getShareText(sectionId))}`;
-                            window.open(telegramLink, '_blank', 'noopener');
-                            return;
-                        }
-
-                        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(getShareText(sectionId))}`;
-                        window.open(whatsappLink, '_blank', 'noopener');
+                if (platform === 'pdf') {
+                    const file = new File([generatePdfBlob(sectionId)], `${judul.replace(/\s+/g, '_')}.pdf`, {
+                        type: 'application/pdf'
                     });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(file);
+                    link.href = url;
+                    link.download = `${judul.replace(/\s+/g, '_')}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
                     return;
                 }
 
                 if (platform === 'copy') {
                     if (navigator.clipboard) {
-                        navigator.clipboard.writeText(getShareText(sectionId)).then(() => {
+                        navigator.clipboard.writeText(shareText).then(() => {
                             alert('Teks laporan berhasil disalin ke clipboard.');
                         }).catch(() => {
-                            alert(getShareText(sectionId));
+                            alert(shareText);
                         });
                     } else {
-                        alert(getShareText(sectionId));
+                        alert(shareText);
                     }
                     return;
                 }
 
                 if (platform === 'telegram') {
-                    const telegramLink = `https://t.me/share?text=${encodeURIComponent(getShareText(sectionId))}`;
+                    const telegramLink = `https://t.me/share?text=${encodeURIComponent(shareText)}`;
                     window.open(telegramLink, '_blank', 'noopener');
                     return;
                 }
 
-                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(getShareText(sectionId))}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: judul,
+                        text: shareText
+                    }).catch(() => {
+                        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                        window.open(whatsappLink, '_blank', 'noopener');
+                    });
+                    return;
+                }
+
+                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                 window.open(whatsappLink, '_blank', 'noopener');
             }
 
