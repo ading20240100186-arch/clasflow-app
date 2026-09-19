@@ -1,0 +1,372 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 100%);
+    color: #1f2937;
+}
+
+.body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 14px 40px;
+    box-sizing: border-box;
+}
+
+.app-shell {
+    width: min(100%, 520px);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 26px;
+    box-shadow: 0 22px 50px rgba(79, 70, 229, 0.15);
+    padding: 18px 14px 22px;
+}
+
+.app-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.title {
+    margin: 0;
+    color: #111827;
+    text-align: center;
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    letter-spacing: 1px;
+    font-weight: 800;
+}
+
+.menu {
+    background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+    border-radius: 18px;
+    padding: 16px 14px;
+    margin: 0 auto 18px;
+    max-width: 100%;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.18);
+}
+
+.install-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 0 0 18px;
+    box-shadow: 0 10px 20px rgba(34, 197, 94, 0.22);
+}
+
+.install-btn.hidden {
+    display: none;
+}
+
+.menu-dropdown summary {
+    list-style: none;
+    cursor: pointer;
+    color: #f9fafb;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 4px;
+    text-align: center;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.menu-dropdown summary:hover {
+    opacity: 0.9;
+}
+
+.menu-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+}
+
+.submenu li {
+    margin-bottom: 10px;
+}
+
+.tab-btn {
+    width: 100%;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e5e7eb;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.96rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+}
+
+.tabel-container {
+    margin-top: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    padding: 16px 12px;
+    border-radius: 20px;
+    max-width: 100%;
+    display: none;
+    backdrop-filter: blur(6px);
+}
+
+.tabel-container.tampil {
+    display: block;
+}
+
+.tabel-container h3 {
+    font-size: 1.25rem;
+    margin: 0 0 14px;
+    color: #111827;
+    text-align: center;
+}
+
+#tabel-belanja {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+#tabel-belanja thead {
+    background: linear-gradient(135deg, #111827 0%, #374151 100%);
+    color: #f9fafb;
+}
+
+#tabel-belanja th,
+#tabel-belanja td {
+    border: 1px solid #e5e7eb;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+#tabel-belanja td {
+    background: #ffffff;
+}
+
+#tabel-belanja td input {
+    width: 92%;
+    padding: 10px 12px;
+    background: #f8fafc;
+    color: #111827;
+    border: 1px solid #dbe3f0;
+    border-radius: 10px;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+#tabel-belanja td input:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+    background: #fff;
+}
+
+.subtotal {
+    font-weight: 700;
+    color: #111827;
+}
+
+.btn-hapus {
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.btn-hapus:hover {
+    background: rgba(239, 68, 68, 0.18);
+    transform: translateY(-1px);
+}
+
+.tombol-tambah {
+    margin: 18px 0 8px;
+}
+
+#btn-tambah {
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#btn-tambah:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.35);
+}
+
+.periode-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+}
+
+.periode-form label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.periode-form select,
+.periode-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dbe3f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #111827;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.periode-form select:focus,
+.periode-form input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+    background: #fff;
+}
+
+.btn-simpan {
+    margin-top: 8px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+}
+
+.ringkasan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1f2937;
+    border: 1px solid #dbeafe;
+}
+
+#hasil-bulanan,
+#hasil-tahunan {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.total-semua {
+    margin-top: 22px;
+    font-size: 1.05rem;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+    color: #111827;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+#total-akhir {
+    font-weight: 800;
+    color: #7c3aed;
+}
+
+@media (max-width: 480px) {
+    .body {
+        padding: 14px 10px 26px;
+    }
+
+    .app-shell {
+        padding: 14px 10px 18px;
+        border-radius: 20px;
+    }
+
+    .menu,
+    .tabel-container {
+        border-radius: 16px;
+    }
+
+    #tabel-belanja {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #tabel-belanja th,
+    #tabel-belanja td {
+        padding: 8px 6px;
+        font-size: 0.75rem;
+    }
+
+    #tabel-belanja td input {
+        width: 88%;
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+
+    .periode-form {
+        max-width: 100%;
+    }
+
+    .ringkasan {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

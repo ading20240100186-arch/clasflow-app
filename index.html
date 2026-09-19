@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="Tampilan_catatan.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta name="theme-color" content="#4f46e5">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <link rel="manifest" href="manifest.json">
+        <title>CATATAN</title>
+    </head>
+    <body class="body">
+        <div class="app-shell">
+            <header class="app-header">
+                <div class="header-badge">CashFlow</div>
+                <h1 class="title">CATATAN</h1>
+            </header>
+
+            <div class="menu">
+                <details class="menu-dropdown" open>
+                    <summary>PENGELUARAN</summary>
+                    <ul class="submenu">
+                        <li><button type="button" class="tab-btn active" data-target="harian">HARIAN</button></li>
+                        <li><button type="button" class="tab-btn" data-target="bulanan">BULANAN</button></li>
+                        <li><button type="button" class="tab-btn" data-target="tahunan">TAHUNAN</button></li>
+                    </ul>
+                </details>
+            </div>
+
+            <button id="installBtn" class="install-btn hidden" type="button">
+                <i class="fa-solid fa-download"></i>
+                Install App
+            </button>
+
+            <div class="tabel-container tampil" id="tabel-harian">
+                <h3>Belanja(HARIAN) </h3>
+                <table id="tabel-belanja">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Jumlah Barang</th>
+                            <th>Harga Barang</th>
+                            <th>Subtotal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="baris-data">
+                            <td><input type="text" class="nama-barang" placeholder="Nama Barang"></td>
+                            <td><input type="number" class="jumlah-barang" value="1" min="1"></td>
+                            <td><input type="number" class="harga-barang" value="0" min="0"></td>
+                            <td class="subtotal">0</td>
+                            <td>
+                                <button class="btn-hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tombol-tambah">
+                    <button id="btn-tambah">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        Tambah Baris
+                    </button>
+                </div>
+
+                <div class="total-semua">
+                    <strong>TOTAL SEMUA HARGA BARANG: </strong>
+                    <span id="total-akhir">0</span>
+                </div>
+            </div>
+
+            <div class="tabel-container" id="tabel-bulanan">
+                <h3>Pengeluaran (Bulanan)</h3>
+                <div class="periode-form">
+                    <label for="bulan-pilih">Pilih Bulan</label>
+                    <select id="bulan-pilih">
+                        <option value="Januari">Januari</option>
+                        <option value="Februari">Februari</option>
+                        <option value="Maret">Maret</option>
+                        <option value="April">April</option>
+                        <option value="Mei">Mei</option>
+                        <option value="Juni">Juni</option>
+                        <option value="Juli">Juli</option>
+                        <option value="Agustus">Agustus</option>
+                        <option value="September">September</option>
+                        <option value="Oktober">Oktober</option>
+                        <option value="November">November</option>
+                        <option value="Desember">Desember</option>
+                    </select>
+
+                    <label for="pengeluaran-bulanan">Jumlah Pengeluaran</label>
+                    <input id="pengeluaran-bulanan" type="number" min="0" value="0" placeholder="Masukkan nominal">
+
+                    <button type="button" id="simpan-bulanan" class="btn-simpan">Simpan</button>
+
+                    <div class="ringkasan">
+                        <span>Sudah tersimpan:</span>
+                        <strong id="hasil-bulanan">Rp 0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabel-container" id="tabel-tahunan">
+                <h3>Pengeluaran (Tahunan)</h3>
+                <div class="periode-form">
+                    <label for="tahun-pilih">Pilih Tahun</label>
+                    <select id="tahun-pilih"></select>
+
+                    <label for="pengeluaran-tahunan">Jumlah Pengeluaran</label>
+                    <input id="pengeluaran-tahunan" type="number" min="0" value="0" placeholder="Masukkan nominal">
+
+                    <button type="button" id="simpan-tahunan" class="btn-simpan">Simpan</button>
+
+                    <div class="ringkasan">
+                        <span>Sudah tersimpan:</span>
+                        <strong id="hasil-tahunan">Rp 0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const tableBody = document.querySelector('#tabel-belanja tbody');
+            const totalAkhir = document.getElementById('total-akhir');
+            const btnTambah = document.getElementById('btn-tambah');
+            const bulanPilih = document.getElementById('bulan-pilih');
+            const tahunPilih = document.getElementById('tahun-pilih');
+            const pengeluaranBulanan = document.getElementById('pengeluaran-bulanan');
+            const pengeluaranTahunan = document.getElementById('pengeluaran-tahunan');
+            const hasilBulanan = document.getElementById('hasil-bulanan');
+            const hasilTahunan = document.getElementById('hasil-tahunan');
+            const simpanBulanan = document.getElementById('simpan-bulanan');
+            const simpanTahunan = document.getElementById('simpan-tahunan');
+
+            function formatRupiah(value) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    maximumFractionDigits: 0
+                }).format(value || 0);
+            }
+
+            function getStorage(key) {
+                try {
+                    return JSON.parse(localStorage.getItem(key)) || {};
+                } catch (error) {
+                    return {};
+                }
+            }
+
+            function saveStorage(key, value) {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+
+            function tampilkanTab(target) {
+                document.querySelectorAll('.tabel-container').forEach((panel) => {
+                    panel.classList.toggle('tampil', panel.id === `tabel-${target}`);
+                });
+
+                document.querySelectorAll('.tab-btn').forEach((button) => {
+                    button.classList.toggle('active', button.dataset.target === target);
+                });
+            }
+
+            document.querySelectorAll('.tab-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    tampilkanTab(button.dataset.target);
+                });
+            });
+
+            function renderBulanan() {
+                const bulan = bulanPilih.value;
+                const dataBulanan = getStorage('dataBulanan');
+                const nilai = dataBulanan[bulan] || 0;
+                pengeluaranBulanan.value = nilai;
+                hasilBulanan.textContent = formatRupiah(nilai);
+            }
+
+            function renderTahunan() {
+                const tahun = tahunPilih.value;
+                const dataTahunan = getStorage('dataTahunan');
+                const nilai = dataTahunan[tahun] || 0;
+                pengeluaranTahunan.value = nilai;
+                hasilTahunan.textContent = formatRupiah(nilai);
+            }
+
+            bulanPilih.addEventListener('change', renderBulanan);
+            tahunPilih.addEventListener('change', renderTahunan);
+
+            simpanBulanan.addEventListener('click', () => {
+                const bulan = bulanPilih.value;
+                const dataBulanan = getStorage('dataBulanan');
+                dataBulanan[bulan] = Number(pengeluaranBulanan.value) || 0;
+                saveStorage('dataBulanan', dataBulanan);
+                renderBulanan();
+            });
+
+            simpanTahunan.addEventListener('click', () => {
+                const tahun = tahunPilih.value;
+                const dataTahunan = getStorage('dataTahunan');
+                dataTahunan[tahun] = Number(pengeluaranTahunan.value) || 0;
+                saveStorage('dataTahunan', dataTahunan);
+                renderTahunan();
+            });
+
+            const tahunSekarang = new Date().getFullYear();
+            for (let tahun = tahunSekarang - 5; tahun <= tahunSekarang + 10; tahun++) {
+                const option = document.createElement('option');
+                option.value = tahun;
+                option.textContent = tahun;
+                tahunPilih.appendChild(option);
+            }
+            tahunPilih.value = tahunSekarang;
+
+            function hitungSubtotal(row) {
+                const jumlah = parseFloat(row.querySelector('.jumlah-barang').value) || 0;
+                const harga = parseFloat(row.querySelector('.harga-barang').value) || 0;
+                const subtotal = jumlah * harga;
+                row.querySelector('.subtotal').textContent = subtotal.toLocaleString('id-ID');
+                return subtotal;
+            }
+
+            function hitungTotal() {
+                let total = 0;
+                document.querySelectorAll('.baris-data').forEach((row) => {
+                    total += hitungSubtotal(row);
+                });
+                totalAkhir.textContent = total.toLocaleString('id-ID');
+            }
+
+            function tambahBaris() {
+                const barisBaru = document.createElement('tr');
+                barisBaru.className = 'baris-data';
+                barisBaru.innerHTML = `
+                    <td><input type="text" class="nama-barang" placeholder="Nama Barang"></td>
+                    <td><input type="number" class="jumlah-barang" value="1" min="1"></td>
+                    <td><input type="number" class="harga-barang" value="0" min="0"></td>
+                    <td class="subtotal">0</td>
+                    <td>
+                        <button class="btn-hapus" type="button">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                barisBaru.querySelector('.jumlah-barang').addEventListener('input', hitungTotal);
+                barisBaru.querySelector('.harga-barang').addEventListener('input', hitungTotal);
+                barisBaru.querySelector('.btn-hapus').addEventListener('click', () => {
+                    barisBaru.remove();
+                    hitungTotal();
+                });
+
+                tableBody.appendChild(barisBaru);
+                hitungTotal();
+            }
+
+            document.querySelectorAll('.jumlah-barang').forEach((input) => {
+                input.addEventListener('input', hitungTotal);
+            });
+
+            document.querySelectorAll('.harga-barang').forEach((input) => {
+                input.addEventListener('input', hitungTotal);
+            });
+
+            document.querySelectorAll('.btn-hapus').forEach((button) => {
+                button.addEventListener('click', () => {
+                    button.closest('.baris-data').remove();
+                    hitungTotal();
+                });
+            });
+
+            btnTambah.addEventListener('click', tambahBaris);
+            renderBulanan();
+            renderTahunan();
+            hitungTotal();
+
+            const installBtn = document.getElementById('installBtn');
+            let deferredPrompt = null;
+
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredPrompt = event;
+                installBtn.classList.remove('hidden');
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) {
+                    return;
+                }
+
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('App installed');
+                }
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            });
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js').catch(() => {
+                        console.log('Service worker registration failed');
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>
