@@ -18,6 +18,18 @@
                 <h1 class="title">CATATAN</h1>
             </header>
 
+            <div class="currency-panel">
+                <label for="mata-uang">MATA UANG</label>
+                <select id="mata-uang">
+                    <option value="MYR">🇲🇾 Ringgit Malaysia (MYR)</option>
+                    <option value="USD">🇺🇸 US Dollar (USD)</option>
+                    <option value="SGD">🇸🇬 Singapore Dollar (SGD)</option>
+                    <option value="EUR">🇪🇺 Euro (EUR)</option>
+                    <option value="GBP">🇬🇧 Pound Sterling (GBP)</option>
+                    <option value="IDR">🇮🇩 Rupiah Indonesia (IDR)</option>
+                </select>
+            </div>
+
             <div class="menu">
                 <details class="menu-dropdown" open>
                     <summary>PENGELUARAN</summary>
@@ -72,6 +84,33 @@
                     <strong>TOTAL SEMUA HARGA BARANG: </strong>
                     <span id="total-akhir">0</span>
                 </div>
+
+                <div class="save-panel">
+                    <div class="save-row">
+                        <label for="bulan-simpan-harian">Bulan</label>
+                        <select id="bulan-simpan-harian">
+                            <option value="Januari">Januari</option>
+                            <option value="Februari">Februari</option>
+                            <option value="Maret">Maret</option>
+                            <option value="April">April</option>
+                            <option value="Mei">Mei</option>
+                            <option value="Juni">Juni</option>
+                            <option value="Juli">Juli</option>
+                            <option value="Agustus">Agustus</option>
+                            <option value="September">September</option>
+                            <option value="Oktober">Oktober</option>
+                            <option value="November">November</option>
+                            <option value="Desember">Desember</option>
+                        </select>
+                    </div>
+
+                    <button type="button" id="simpan-harian" class="btn-simpan-harian">Simpan ke Bulanan</button>
+                    <div class="share-actions">
+                        <button type="button" class="btn-share whatsapp" data-section="tabel-harian" data-platform="whatsapp">WhatsApp</button>
+                        <button type="button" class="btn-share telegram" data-section="tabel-harian" data-platform="telegram">Telegram</button>
+                        <button type="button" class="btn-share copy" data-section="tabel-harian" data-platform="copy">Salin Teks</button>
+                    </div>
+                </div>
             </div>
 
             <div class="tabel-container" id="tabel-bulanan">
@@ -93,14 +132,24 @@
                         <option value="Desember">Desember</option>
                     </select>
 
+                    <div class="summary-box">
+                        <span>Jumlah harian tersimpan:</span>
+                        <strong id="hasil-bulanan-harian">RM 0.00</strong>
+                    </div>
+
                     <label for="pengeluaran-bulanan">Jumlah Pengeluaran</label>
                     <input id="pengeluaran-bulanan" type="number" min="0" value="0" placeholder="Masukkan nominal">
 
                     <button type="button" id="simpan-bulanan" class="btn-simpan">Simpan</button>
+                    <div class="share-actions">
+                        <button type="button" class="btn-share whatsapp" data-section="tabel-bulanan" data-platform="whatsapp">WhatsApp</button>
+                        <button type="button" class="btn-share telegram" data-section="tabel-bulanan" data-platform="telegram">Telegram</button>
+                        <button type="button" class="btn-share copy" data-section="tabel-bulanan" data-platform="copy">Salin Teks</button>
+                    </div>
 
                     <div class="ringkasan">
                         <span>Sudah tersimpan:</span>
-                        <strong id="hasil-bulanan">Rp 0</strong>
+                        <strong id="hasil-bulanan">RM 0.00</strong>
                     </div>
                 </div>
             </div>
@@ -112,13 +161,18 @@
                     <select id="tahun-pilih"></select>
 
                     <label for="pengeluaran-tahunan">Jumlah Pengeluaran</label>
-                    <input id="pengeluaran-tahunan" type="number" min="0" value="0" placeholder="Masukkan nominal">
+                    <input id="pengeluaran-tahunan" type="number" min="0" value="0" placeholder="Masukkan nominal" readonly>
 
-                    <button type="button" id="simpan-tahunan" class="btn-simpan">Simpan</button>
+                    <button type="button" id="simpan-tahunan" class="btn-simpan">Sinkronkan Tahun</button>
+                    <div class="share-actions">
+                        <button type="button" class="btn-share whatsapp" data-section="tabel-tahunan" data-platform="whatsapp">WhatsApp</button>
+                        <button type="button" class="btn-share telegram" data-section="tabel-tahunan" data-platform="telegram">Telegram</button>
+                        <button type="button" class="btn-share copy" data-section="tabel-tahunan" data-platform="copy">Salin Teks</button>
+                    </div>
 
                     <div class="ringkasan">
                         <span>Sudah tersimpan:</span>
-                        <strong id="hasil-tahunan">Rp 0</strong>
+                        <strong id="hasil-tahunan">RM 0.00</strong>
                     </div>
                 </div>
             </div>
@@ -129,20 +183,36 @@
             const totalAkhir = document.getElementById('total-akhir');
             const btnTambah = document.getElementById('btn-tambah');
             const bulanPilih = document.getElementById('bulan-pilih');
+            const bulanSimpanHarian = document.getElementById('bulan-simpan-harian');
             const tahunPilih = document.getElementById('tahun-pilih');
+            const mataUangSelect = document.getElementById('mata-uang');
             const pengeluaranBulanan = document.getElementById('pengeluaran-bulanan');
             const pengeluaranTahunan = document.getElementById('pengeluaran-tahunan');
             const hasilBulanan = document.getElementById('hasil-bulanan');
+            const hasilBulananHarian = document.getElementById('hasil-bulanan-harian');
             const hasilTahunan = document.getElementById('hasil-tahunan');
             const simpanBulanan = document.getElementById('simpan-bulanan');
             const simpanTahunan = document.getElementById('simpan-tahunan');
+            const simpanHarian = document.getElementById('simpan-harian');
+            const namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            const configMataUang = {
+                MYR: { locale: 'ms-MY', currency: 'MYR', minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                USD: { locale: 'en-US', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                SGD: { locale: 'en-SG', currency: 'SGD', minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                EUR: { locale: 'de-DE', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                GBP: { locale: 'en-GB', currency: 'GBP', minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                IDR: { locale: 'id-ID', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }
+            };
 
             function formatRupiah(value) {
-                return new Intl.NumberFormat('id-ID', {
+                const pilihan = configMataUang[mataUangSelect.value] || configMataUang.MYR;
+                return new Intl.NumberFormat(pilihan.locale, {
                     style: 'currency',
-                    currency: 'IDR',
-                    maximumFractionDigits: 0
-                }).format(value || 0);
+                    currency: pilihan.currency,
+                    minimumFractionDigits: pilihan.minimumFractionDigits,
+                    maximumFractionDigits: pilihan.maximumFractionDigits
+                }).format(Number(value) || 0);
             }
 
             function getStorage(key) {
@@ -157,6 +227,81 @@
                 localStorage.setItem(key, JSON.stringify(value));
             }
 
+            function getTahunAktif() {
+                return Number(tahunPilih.value || new Date().getFullYear());
+            }
+
+            function getBulananAktif() {
+                return bulanPilih.value || namaBulan[new Date().getMonth()];
+            }
+
+            function hitungTotalHarian() {
+                let total = 0;
+                document.querySelectorAll('.baris-data').forEach((row) => {
+                    total += hitungSubtotal(row);
+                });
+                return total;
+            }
+
+            function getShareText(sectionId) {
+                const mataUang = mataUangSelect.options[mataUangSelect.selectedIndex].text;
+
+                if (sectionId === 'tabel-harian') {
+                    return `Laporan Belanja Harian\nBulan: ${bulanSimpanHarian.value}\nTotal: ${totalAkhir.textContent}\nMata uang: ${mataUang}`;
+                }
+
+                if (sectionId === 'tabel-bulanan') {
+                    return `Laporan Belanja Bulanan\nBulan: ${bulanPilih.value}\nTahun: ${tahunPilih.value}\nTotal: ${hasilBulanan.textContent}\nJumlah harian tersimpan: ${hasilBulananHarian.textContent}\nMata uang: ${mataUang}`;
+                }
+
+                return `Laporan Belanja Tahunan\nTahun: ${tahunPilih.value}\nTotal: ${hasilTahunan.textContent}\nMata uang: ${mataUang}`;
+            }
+
+            function bagikanSection(sectionId, platform = 'whatsapp') {
+                const judul = {
+                    'tabel-harian': 'Laporan Belanja Harian',
+                    'tabel-bulanan': 'Laporan Belanja Bulanan',
+                    'tabel-tahunan': 'Laporan Belanja Tahunan'
+                }[sectionId] || 'Laporan Keuangan';
+
+                const shareText = `${judul}\n\n${getShareText(sectionId)}`;
+                const shareUrl = window.location.href;
+
+                if (platform === 'copy') {
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            alert('Teks laporan berhasil disalin ke clipboard.');
+                        }).catch(() => {
+                            alert(shareText);
+                        });
+                    } else {
+                        alert(shareText);
+                    }
+                    return;
+                }
+
+                if (platform === 'telegram') {
+                    const telegramLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+                    window.open(telegramLink, '_blank', 'noopener');
+                    return;
+                }
+
+                if (navigator.share) {
+                    navigator.share({
+                        title: judul,
+                        text: shareText,
+                        url: shareUrl
+                    }).catch(() => {
+                        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                        window.open(whatsappLink, '_blank', 'noopener');
+                    });
+                    return;
+                }
+
+                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                window.open(whatsappLink, '_blank', 'noopener');
+            }
+
             function tampilkanTab(target) {
                 document.querySelectorAll('.tabel-container').forEach((panel) => {
                     panel.classList.toggle('tampil', panel.id === `tabel-${target}`);
@@ -167,45 +312,116 @@
                 });
             }
 
-            document.querySelectorAll('.tab-btn').forEach((button) => {
-                button.addEventListener('click', () => {
-                    tampilkanTab(button.dataset.target);
-                });
-            });
-
             function renderBulanan() {
-                const bulan = bulanPilih.value;
+                const bulan = getBulananAktif();
+                const tahun = getTahunAktif();
                 const dataBulanan = getStorage('dataBulanan');
-                const nilai = dataBulanan[bulan] || 0;
+                const dataHarian = getStorage('dataHarian');
+                const nilai = Number(dataBulanan[tahun]?.[bulan] || 0);
+                const totalHarianBulan = Number(dataHarian[tahun]?.[bulan] || 0);
+
                 pengeluaranBulanan.value = nilai;
                 hasilBulanan.textContent = formatRupiah(nilai);
+                hasilBulananHarian.textContent = formatRupiah(totalHarianBulan);
             }
 
             function renderTahunan() {
-                const tahun = tahunPilih.value;
+                const tahun = getTahunAktif();
+                const dataBulanan = getStorage('dataBulanan');
                 const dataTahunan = getStorage('dataTahunan');
-                const nilai = dataTahunan[tahun] || 0;
+                const nilaiBulanan = Object.values(dataBulanan[tahun] || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+                const nilai = Number(dataTahunan[tahun] || nilaiBulanan || 0);
+
+                if (!dataTahunan[tahun] || Number(dataTahunan[tahun]) !== nilaiBulanan) {
+                    dataTahunan[tahun] = nilaiBulanan;
+                    saveStorage('dataTahunan', dataTahunan);
+                }
+
                 pengeluaranTahunan.value = nilai;
                 hasilTahunan.textContent = formatRupiah(nilai);
             }
 
-            bulanPilih.addEventListener('change', renderBulanan);
-            tahunPilih.addEventListener('change', renderTahunan);
+            function syncMonthSelectors() {
+                const bulanAktif = getBulananAktif();
+                bulanPilih.value = bulanAktif;
+                bulanSimpanHarian.value = bulanAktif;
+            }
 
-            simpanBulanan.addEventListener('click', () => {
-                const bulan = bulanPilih.value;
-                const dataBulanan = getStorage('dataBulanan');
-                dataBulanan[bulan] = Number(pengeluaranBulanan.value) || 0;
-                saveStorage('dataBulanan', dataBulanan);
+            mataUangSelect.addEventListener('change', () => {
+                renderBulanan();
+                renderTahunan();
+                hitungTotal();
+            });
+
+            bulanPilih.addEventListener('change', () => {
+                syncMonthSelectors();
                 renderBulanan();
             });
 
+            bulanSimpanHarian.addEventListener('change', () => {
+                bulanPilih.value = bulanSimpanHarian.value;
+                renderBulanan();
+            });
+
+            tahunPilih.addEventListener('change', () => {
+                syncMonthSelectors();
+                renderBulanan();
+                renderTahunan();
+            });
+
+            simpanHarian.addEventListener('click', () => {
+                const bulan = bulanSimpanHarian.value;
+                const tahun = getTahunAktif();
+                const totalHarian = hitungTotalHarian();
+                const dataHarian = getStorage('dataHarian');
+                const dataBulanan = getStorage('dataBulanan');
+
+                if (!dataHarian[tahun]) {
+                    dataHarian[tahun] = {};
+                }
+                if (!dataBulanan[tahun]) {
+                    dataBulanan[tahun] = {};
+                }
+
+                dataHarian[tahun][bulan] = Number(dataHarian[tahun][bulan] || 0) + totalHarian;
+                dataBulanan[tahun][bulan] = Number(dataBulanan[tahun][bulan] || 0) + totalHarian;
+
+                saveStorage('dataHarian', dataHarian);
+                saveStorage('dataBulanan', dataBulanan);
+                syncMonthSelectors();
+                renderBulanan();
+                renderTahunan();
+            });
+
+            simpanBulanan.addEventListener('click', () => {
+                const bulan = getBulananAktif();
+                const tahun = getTahunAktif();
+                const dataBulanan = getStorage('dataBulanan');
+                const nilai = Number(pengeluaranBulanan.value) || 0;
+
+                if (!dataBulanan[tahun]) {
+                    dataBulanan[tahun] = {};
+                }
+
+                dataBulanan[tahun][bulan] = nilai;
+                saveStorage('dataBulanan', dataBulanan);
+                renderBulanan();
+                renderTahunan();
+            });
+
             simpanTahunan.addEventListener('click', () => {
-                const tahun = tahunPilih.value;
+                const tahun = getTahunAktif();
                 const dataTahunan = getStorage('dataTahunan');
-                dataTahunan[tahun] = Number(pengeluaranTahunan.value) || 0;
+                const totalTahun = Object.values(getStorage('dataBulanan')[tahun] || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+                dataTahunan[tahun] = totalTahun;
                 saveStorage('dataTahunan', dataTahunan);
                 renderTahunan();
+            });
+
+            document.querySelectorAll('.tab-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    tampilkanTab(button.dataset.target);
+                });
             });
 
             const tahunSekarang = new Date().getFullYear();
@@ -217,20 +433,21 @@
             }
             tahunPilih.value = tahunSekarang;
 
+            const bulanSekarang = namaBulan[new Date().getMonth()];
+            bulanPilih.value = bulanSekarang;
+            bulanSimpanHarian.value = bulanSekarang;
+
             function hitungSubtotal(row) {
                 const jumlah = parseFloat(row.querySelector('.jumlah-barang').value) || 0;
                 const harga = parseFloat(row.querySelector('.harga-barang').value) || 0;
                 const subtotal = jumlah * harga;
-                row.querySelector('.subtotal').textContent = subtotal.toLocaleString('id-ID');
+                row.querySelector('.subtotal').textContent = formatRupiah(subtotal);
                 return subtotal;
             }
 
             function hitungTotal() {
-                let total = 0;
-                document.querySelectorAll('.baris-data').forEach((row) => {
-                    total += hitungSubtotal(row);
-                });
-                totalAkhir.textContent = total.toLocaleString('id-ID');
+                const total = hitungTotalHarian();
+                totalAkhir.textContent = formatRupiah(total);
             }
 
             function tambahBaris() {
@@ -271,6 +488,12 @@
                 button.addEventListener('click', () => {
                     button.closest('.baris-data').remove();
                     hitungTotal();
+                });
+            });
+
+            document.querySelectorAll('.btn-share').forEach((button) => {
+                button.addEventListener('click', () => {
+                    bagikanSection(button.dataset.section, button.dataset.platform);
                 });
             });
 

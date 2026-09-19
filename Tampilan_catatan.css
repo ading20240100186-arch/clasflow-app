@@ -53,6 +53,36 @@ body {
     font-weight: 800;
 }
 
+.currency-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.currency-panel label {
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: #374151;
+}
+
+.currency-panel select {
+    width: 100%;
+    border: 1px solid #dbe3f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #111827;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
 .menu {
     background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
     border-radius: 18px;
@@ -290,7 +320,8 @@ body {
     box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
 
-.ringkasan {
+.ringkasan,
+.summary-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -304,6 +335,7 @@ body {
 }
 
 #hasil-bulanan,
+#hasil-bulanan-harian,
 #hasil-tahunan {
     color: #1d4ed8;
     font-weight: 800;
@@ -321,6 +353,85 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     text-align: center;
+    flex-direction: column;
+}
+
+.save-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.save-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.save-row label {
+    font-weight: 700;
+    color: #374151;
+}
+
+.save-row select,
+.save-panel .btn-simpan-harian,
+.save-panel .btn-export-pdf,
+.save-panel .btn-share,
+.btn-export-pdf,
+.btn-share,
+.btn-simpan-harian {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.save-row select {
+    padding: 12px 14px;
+    border: 1px solid #dbe3f0;
+    background: #f8fafc;
+    color: #111827;
+}
+
+.btn-simpan-harian {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+}
+
+.share-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.btn-share {
+    flex: 1 1 100px;
+    min-height: 44px;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+}
+
+.btn-share.whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+}
+
+.btn-share.telegram {
+    background: linear-gradient(135deg, #0088cc 0%, #3a8dde 100%);
+}
+
+.btn-share.copy {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
 }
 
 #total-akhir {
@@ -365,8 +476,13 @@ body {
         max-width: 100%;
     }
 
-    .ringkasan {
+    .ringkasan,
+    .summary-box {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .save-panel {
+        margin-top: 14px;
     }
 }
